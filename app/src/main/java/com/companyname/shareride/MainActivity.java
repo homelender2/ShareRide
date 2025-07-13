@@ -53,9 +53,6 @@ public class MainActivity extends AppCompatActivity {
             redirectToLogin();
         } else if (!currentUser.isEmailVerified()) {
             // Optional: You can also check for email verification
-            Toast.makeText(this, "Please verify your email before proceeding", Toast.LENGTH_LONG).show();
-            firebaseAuth.signOut();
-            redirectToLogin();
             // firebaseAuth.signOut();
             // redirectToLogin();
         }

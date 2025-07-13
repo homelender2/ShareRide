@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> loginUser());
 
         tvSignup.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
         });
 
         tvForgotPassword.setOnClickListener(v -> resetPassword());
@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                     showProgressBar(false);
                     if (task.isSuccessful()) {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        if (user != null && user.isEmailVerified()) {
+                        if (user != null) {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         } else {
