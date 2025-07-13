@@ -1,7 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ShareRide" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <!-- Base Dark Theme -->
+    <style name="Base.Theme.ShareRide.Dark" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="android:textColorPrimary">@color/text_gray</item>
+        <item name="android:textColorSecondary">@color/text_gray</item>
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryDark">@color/primary_green_dark</item>
+        <item name="colorAccent">@color/secondary_blue</item>
+        <item name="android:windowBackground">@android:color/black</item> <!-- You can tweak this! -->
     </style>
+
+    <style name="Theme.ShareRide" parent="Base.Theme.ShareRide.Dark" />
 </resources>

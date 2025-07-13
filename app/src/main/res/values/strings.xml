@@ -1,3 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ShareRide</string>
+
+    <string-array name="when_options">
+        <item>Now</item>
+        <item>In 15 minutes</item>
+        <item>In 30 minutes</item>
+        <item>In 1 hour</item>
+    </string-array>
+
+    <string-array name="max_passengers_options">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
 </resources>

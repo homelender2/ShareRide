@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ShareRide" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Base Light Theme -->
+    <style name="Base.Theme.ShareRide.Light" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryDark">@color/primary_green_dark</item>
+        <item name="colorAccent">@color/secondary_blue</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
-    <style name="Theme.ShareRide" parent="Base.Theme.ShareRide" />
+    <style name="Theme.ShareRide" parent="Base.Theme.ShareRide.Light" />
 </resources>
