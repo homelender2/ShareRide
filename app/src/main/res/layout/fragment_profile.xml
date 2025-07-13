@@ -2,137 +2,239 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fillViewport="true"
+    android:background="@color/background_color">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <!-- Profile Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:background="@drawable/bg_profile_section"
-            android:layout_marginBottom="20dp">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@color/white"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/circle_background"
+                android:contentDescription="Profile Picture"
+                android:padding="16dp"
+                android:src="@drawable/ic_person" />
 
             <TextView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:text="R"
-                android:textSize="24sp"
-                android:textColor="@android:color/white"
-                android:background="@drawable/bg_profile_pic"
-                android:gravity="center"
-                android:layout_marginEnd="16dp" />
-
-            <LinearLayout
+                android:id="@+id/tv_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_gravity="center"
+                android:text="Loading..."
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="⭐⭐⭐⭐⭐ 4.8 (24 rides)"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- Stats Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your Stats"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Savings -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="@drawable/stat_item_background"
+                android:layout_marginBottom="8dp">
 
                 <TextView
-                    android:id="@+id/tv_user_name"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_savings"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Raj Kumar"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
+                    android:text="💰 Total Saved: ₹840"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+            </LinearLayout>
+
+            <!-- Rides Shared -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="@drawable/stat_item_background"
+                android:layout_marginBottom="8dp">
 
                 <TextView
-                    android:id="@+id/tv_rating"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_rides_shared"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="⭐⭐⭐⭐⭐ 4.8 (24 rides)"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                    android:text="🚗 Rides Shared: 12"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+            </LinearLayout>
+
+            <!-- CO2 Reduced -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="@drawable/stat_item_background">
+
+                <TextView
+                    android:id="@+id/tv_co2_reduced"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🌱 CO₂ Reduced: 2.4 kg"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- This Month Stats -->
+        <!-- Account Settings -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_profile_section"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:background="@color/white"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="This Month"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="18sp"
+                android:text="Account Settings"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:textColor="@color/text_primary"
+                android:padding="16dp"
+                android:background="@color/background_color" />
 
-            <TextView
-                android:id="@+id/tv_savings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="💰 Total Saved: ₹840"
-                android:textSize="16sp"
-                android:textColor="?android:textColorSecondary"
-                android:layout_marginBottom="8dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
 
-            <TextView
-                android:id="@+id/tv_rides_shared"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🚗 Rides Shared: 12"
-                android:textColor="?android:textColorSecondary"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" />
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground">
 
-            <TextView
-                android:id="@+id/tv_co2_reduced"
-                android:layout_width="wrap_content"
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_person"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Edit Profile" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Edit Profile"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:contentDescription="Arrow" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?android:textColorSecondary"
-                android:text="🌱 CO₂ Reduced: 2.4 kg"
-                android:textSize="16sp" />
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_history"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Ride History" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ride History"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:contentDescription="Arrow" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Frequent Routes -->
-        <LinearLayout
+        <!-- Logout Button -->
+        <Button
+            android:id="@+id/logout_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_profile_section"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Frequent Routes"
-                android:textSize="18sp"
-                android:textColor="?android:textColorPrimary"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏠 Home → Office (8 times)"
-                android:textColor="?android:textColorSecondary"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏢 Office → Mall (4 times)"
-                android:textColor="?android:textColorSecondary"
-                android:textSize="16sp" />
-
-        </LinearLayout>
+            android:layout_height="56dp"
+            android:text="Logout"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/primary"
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 
