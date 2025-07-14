@@ -15,7 +15,7 @@ public class HomeFragment extends Fragment {
     private EditText etFrom, etTo;
     private Spinner spnWhen;
     private Button btnFindRides, btnCreateRoute;
-    private TextView tvUserName, tvRating;
+    private TextView tvUserName, tvRating, tvUserProfileAlphabet;
     private UserDataManager userDataManager;
 
     @Override
@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
         btnCreateRoute = view.findViewById(R.id.btn_create_route);
         tvUserName = view.findViewById(R.id.tv_user_name);
         tvRating = view.findViewById(R.id.tv_rating);
+        tvUserProfileAlphabet = view.findViewById(R.id.tv_user_profile_alphabet);
     }
 
     private void loadUserData() {
@@ -72,8 +73,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateUI() {
-        // Set welcome message with user name
+        // Get Username
         String userName = userDataManager.getUserName();
+
+        // Set Profile Alphabet
+        tvUserProfileAlphabet.setText("" + userName.charAt(0));
+
+        // Set welcome message with user name
         tvUserName.setText("Welcome back, " + userName + "!");
 
         // Set short rating

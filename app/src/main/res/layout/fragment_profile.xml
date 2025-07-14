@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/background_color">
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="24dp"
-            android:background="@color/white"
+            android:background="?android:colorBackground"
             android:layout_marginBottom="16dp"
             android:elevation="4dp">
 
@@ -39,7 +39,7 @@
                 android:text="Loading..."
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary"
+                
                 android:layout_marginBottom="8dp" />
 
             <TextView
@@ -49,7 +49,7 @@
                 android:layout_gravity="center"
                 android:text="⭐⭐⭐⭐⭐ 4.8 (24 rides)"
                 android:textSize="16sp"
-                android:textColor="@color/text_secondary" />
+                android:textColor="?android:textColorPrimary" />
 
         </LinearLayout>
 
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/white"
+            android:background="?android:colorBackground"
             android:layout_marginBottom="16dp"
             android:elevation="4dp"
             android:padding="16dp">
@@ -69,29 +69,29 @@
                 android:text="Your Stats"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary"
                 android:layout_marginBottom="16dp" />
 
             <!-- Savings -->
+
+            <!-- Rides Shared -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="12dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/stat_item_background"
-                android:layout_marginBottom="8dp">
+                android:orientation="horizontal"
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/tv_savings"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="💰 Total Saved: ₹840"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
-            <!-- Rides Shared -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:text="🚗 Rides Shared: 12"
                     android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
+                    android:textColor="?android:textColorPrimary"/>
 
             </LinearLayout>
 
@@ -124,7 +124,7 @@
                     android:layout_height="wrap_content"
                     android:text="🌱 CO₂ Reduced: 2.4 kg"
                     android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
+                    android:textColor="?android:textColorPrimary"/>
 
             </LinearLayout>
 
@@ -135,7 +135,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/white"
+            android:background="?android:colorBackground"
             android:layout_marginBottom="16dp"
             android:elevation="4dp">
 
@@ -145,9 +145,8 @@
                 android:text="Account Settings"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary"
                 android:padding="16dp"
-                android:background="@color/background_color" />
+                android:background="?android:colorBackground" />
 
             <View
                 android:layout_width="match_parent"
@@ -176,7 +175,8 @@
                     android:layout_weight="1"
                     android:text="Edit Profile"
                     android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
+                    
+ />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -213,7 +213,7 @@
                     android:layout_weight="1"
                     android:text="Ride History"
                     android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
+                     />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -233,7 +233,7 @@
             android:text="Logout"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:backgroundTint="@color/primary"
+            android:backgroundTint="?android:colorPrimary"
             android:layout_marginTop="8dp" />
 
     </LinearLayout>
