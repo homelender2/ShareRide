@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private FragmentManager fragmentManager;
     private FirebaseAuth firebaseAuth;
+    private UserDataManager userDataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +30,17 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
 
+        // Initialize UserDataManager
+        userDataManager = UserDataManager.getInstance();
+
         // Check if user is logged in
         checkUserAuthentication();
 
         initViews();
         setupBottomNavigation();
+
+        // Load user data after authentication check
+        loadUserDataOnStart();
 
         // Load default fragment
         if (savedInstanceState == null) {
@@ -100,5 +107,33 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
+    }
+
+    private void loadUserDataOnStart() {
+        // Load user data when app starts (after authentication check)
+        userDataManager.loadUserData(new UserDataManager.UserDataCallback() {
+            @Override
+            public void onUserDataLoaded() {
+                // Data is now available for all fragments
+                // No need to do anything here as fragments will access data when needed
+            }
+
+            @Override
+            public void onUserDataError(String error) {
+                // Handle error if needed
+                // Default values will be used
+                // Optionally show a toast for debugging
+                // Toast.makeText(MainActivity.this, "Error loading user data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Optionally refresh user data when app resumes
+        if (userDataManager != null && userDataManager.isDataLoaded()) {
+            userDataManager.refreshUserData(null);
+        }
     }
 }

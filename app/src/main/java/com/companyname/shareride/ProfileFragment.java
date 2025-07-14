@@ -13,16 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
 
     private TextView tvUserName, tvRating, tvSavings, tvRidesShared, tvCO2Reduced;
     private Button logoutButton;
     private FirebaseAuth auth;
-    private FirebaseFirestore db;
+    private UserDataManager userDataManager;
 
     @Nullable
     @Override
@@ -31,7 +28,7 @@ public class ProfileFragment extends Fragment {
 
         // Initialize Firebase
         auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        userDataManager = UserDataManager.getInstance();
 
         // Initialize views
         initViews(view);
@@ -39,7 +36,7 @@ public class ProfileFragment extends Fragment {
         // Set logout button click listener
         logoutButton.setOnClickListener(v -> logout());
 
-        // Load user data from Firebase
+        // Load user data using UserDataManager
         loadUserData();
 
         return view;
@@ -55,59 +52,48 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadUserData() {
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
-            // Load user data from Firestore
-            db.collection("users").document(user.getUid())
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("name");
-                            if (name != null) {
-                                tvUserName.setText(name);
-                            } else {
-                                tvUserName.setText("Unknown User");
-                            }
+        // Check if data is already loaded
+        if (userDataManager.isDataLoaded()) {
+            updateUI();
+        } else {
+            // Load data from Firebase
+            userDataManager.loadUserData(new UserDataManager.UserDataCallback() {
+                @Override
+                public void onUserDataLoaded() {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> updateUI());
+                    }
+                }
 
-                            // Load profile stats from Firestore or set defaults
-                            setupUserStats(documentSnapshot);
-                        } else {
-                            // If no user document exists, set default values
-                            tvUserName.setText("Unknown User");
-                            setupDefaultStats();
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle error - set default values
-                        tvUserName.setText("Error loading name");
-                        setupDefaultStats();
-                    });
+                @Override
+                public void onUserDataError(String error) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            // Still update UI with default values
+                            updateUI();
+                        });
+                    }
+                }
+            });
         }
     }
 
-    private void setupUserStats(DocumentSnapshot documentSnapshot) {
-        // Get stats from Firestore document or use defaults
-        String rating = documentSnapshot.getString("rating");
-        String savings = documentSnapshot.getString("savings");
-        String ridesShared = documentSnapshot.getString("ridesShared");
-        String co2Reduced = documentSnapshot.getString("co2Reduced");
-
-        // Set values or defaults
-        tvRating.setText(rating != null ? rating : "⭐⭐⭐⭐⭐ 4.8 (24 rides)");
-        tvSavings.setText(savings != null ? savings : "💰 Total Saved: ₹840");
-        tvRidesShared.setText(ridesShared != null ? ridesShared : "🚗 Rides Shared: 12");
-        tvCO2Reduced.setText(co2Reduced != null ? co2Reduced : "🌱 CO₂ Reduced: 2.4 kg");
-    }
-
-    private void setupDefaultStats() {
-        tvRating.setText("⭐⭐⭐⭐⭐ 4.8 (24 rides)");
-        tvSavings.setText("💰 Total Saved: ₹840");
-        tvRidesShared.setText("🚗 Rides Shared: 12");
-        tvCO2Reduced.setText("🌱 CO₂ Reduced: 2.4 kg");
+    private void updateUI() {
+        tvUserName.setText(userDataManager.getUserName());
+        tvRating.setText(userDataManager.getRating());
+        tvSavings.setText(userDataManager.getSavings());
+        tvRidesShared.setText(userDataManager.getRidesShared());
+        tvCO2Reduced.setText(userDataManager.getCo2Reduced());
     }
 
     private void logout() {
+        // Clear user data from manager
+        userDataManager.clearUserData();
+
+        // Sign out from Firebase
         auth.signOut();
+
+        // Navigate to login
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
