@@ -80,7 +80,7 @@ public class HomeFragment extends Fragment {
         tvUserProfileAlphabet.setText("" + userName.charAt(0));
 
         // Set welcome message with user name
-        tvUserName.setText("Welcome back, " + userName + "!");
+        tvUserName.setText("Welcome back, " + userName.split("\\s+")[0] + "!");
 
         // Set short rating
         tvRating.setText(userDataManager.getShortRating());

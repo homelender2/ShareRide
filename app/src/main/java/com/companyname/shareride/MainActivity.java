@@ -3,6 +3,9 @@ package com.companyname.shareride;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private UserDataManager userDataManager;
 
+    // Loading screen components
+    private View loadingScreen;
+    private ProgressBar loadingProgressBar;
+    private TextView loadingText;
+    private View mainContent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,13 +48,11 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         setupBottomNavigation();
 
+        // Show loading screen initially
+        showLoadingScreen();
+
         // Load user data after authentication check
         loadUserDataOnStart();
-
-        // Load default fragment
-        if (savedInstanceState == null) {
-            loadFragment(new HomeFragment());
-        }
     }
 
     @Override
@@ -75,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         fragmentManager = getSupportFragmentManager();
+
+        // Initialize loading screen components
+        loadingScreen = findViewById(R.id.loading_screen);
+        loadingProgressBar = findViewById(R.id.loading_progress_bar);
+        loadingText = findViewById(R.id.loading_text);
+        mainContent = findViewById(R.id.main_content);
     }
 
     private void setupBottomNavigation() {
@@ -109,21 +122,55 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    private void showLoadingScreen() {
+        if (loadingScreen != null) {
+            loadingScreen.setVisibility(View.VISIBLE);
+            loadingText.setText("Loading your data...");
+        }
+        if (mainContent != null) {
+            mainContent.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideLoadingScreen() {
+        if (loadingScreen != null) {
+            loadingScreen.setVisibility(View.GONE);
+        }
+        if (mainContent != null) {
+            mainContent.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void loadUserDataOnStart() {
         // Load user data when app starts (after authentication check)
         userDataManager.loadUserData(new UserDataManager.UserDataCallback() {
             @Override
             public void onUserDataLoaded() {
                 // Data is now available for all fragments
-                // No need to do anything here as fragments will access data when needed
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideLoadingScreen();
+                        // Load default fragment after data is loaded
+                        loadFragment(new HomeFragment());
+                    }
+                });
             }
 
             @Override
             public void onUserDataError(String error) {
                 // Handle error if needed
-                // Default values will be used
-                // Optionally show a toast for debugging
-                // Toast.makeText(MainActivity.this, "Error loading user data", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideLoadingScreen();
+                        // Load default fragment even on error (with default values)
+                        loadFragment(new HomeFragment());
+
+                        // Optionally show error message
+                        Toast.makeText(MainActivity.this, "Error loading user data", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
