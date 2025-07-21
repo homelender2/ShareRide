@@ -6,10 +6,6 @@
         android:icon="@drawable/ic_home"
         android:title="Home" />
     <item
-        android:id="@+id/nav_find"
-        android:icon="@drawable/ic_search"
-        android:title="Find" />
-    <item
         android:id="@+id/nav_rides"
         android:icon="@drawable/ic_car"
         android:title="My Rides" />

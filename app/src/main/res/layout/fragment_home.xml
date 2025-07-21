@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,143 +12,333 @@
         android:orientation="vertical">
 
         <!-- Profile Section -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:background="@drawable/bg_profile_section"
-            android:layout_marginBottom="24dp">
-
-            <TextView
-                android:id="@+id/tv_user_profile_alphabet"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:text=""
-                android:textSize="24sp"
-                android:textColor="@android:color/white"
-                android:background="@drawable/bg_profile_pic"
-                android:gravity="center"
-                android:layout_marginEnd="16dp" />
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            android:background="@drawable/bg_profile_section">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/tv_user_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Welcome back!"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
+                    android:id="@+id/tv_user_profile_alphabet"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:text=""
+                    android:textSize="24sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_profile_pic"
+                    android:gravity="center"
+                    android:layout_marginEnd="16dp" />
 
-                <TextView
-                    android:id="@+id/tv_rating"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⭐⭐⭐⭐⭐"
-                    android:textColor="?android:textColorPrimary"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Welcome back!"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⭐⭐⭐⭐⭐"
+                        android:textColor="?android:textColorPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- From Input -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="From"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
+        <!-- SEARCH FORM LAYOUT -->
         <LinearLayout
+            android:id="@+id/layout_search_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical"
+            android:visibility="visible">
 
-            <EditText
-                android:id="@+id/et_from"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:hint="Enter location"
-                android:textColorHint="?android:textColorPrimary"
-                android:text=""
-                android:padding="12dp"
-                android:background="@drawable/bg_edit_text"
-                android:layout_marginEnd="8dp"
-                android:inputType="text"
-                android:maxLines="1" />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp">
 
-            <Button
-                android:id="@+id/btn_current_location"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:text="📍"
-                android:textSize="16sp"
-                android:background="@drawable/bg_button_primary"
-                android:textColor="@android:color/white"
-                android:contentDescription="Use current location" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Find Your Ride"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="20dp" />
+
+                    <!-- From Location -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:startIconDrawable="@drawable/ic_location_on"
+                        app:startIconTint="#4CAF50"
+                        app:boxStrokeColor="?android:colorPrimaryDark"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/et_from"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Pickup location"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:completionThreshold="2" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Current Location Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_current_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="Use Current Location"
+                        android:textColor="#4CAF50"
+                        app:backgroundTint="@android:color/transparent"
+                        app:strokeColor="#4CAF50"
+                        app:strokeWidth="1dp"
+                        app:cornerRadius="8dp"
+                        app:icon="@drawable/ic_my_location"
+                        app:iconTint="#4CAF50"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                    <!-- To Location -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:startIconDrawable="@drawable/ic_location_on"
+                        app:startIconTint="?android:colorPrimaryDark"
+                        app:boxStrokeColor="?android:colorPrimaryDark"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/et_to"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Destination"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:completionThreshold="2" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- When Spinner -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        app:startIconDrawable="@drawable/ic_schedule"
+                        app:startIconTint="?android:colorPrimaryDark"
+                        app:boxStrokeColor="?android:colorPrimaryDark"
+                        app:hintTextColor="?android:textColorPrimary"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/spn_when"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="When do you want to travel?"
+                            android:inputType="none"
+                            android:focusable="false"
+                            android:cursorVisible="false"
+                            android:contentDescription="Select travel time" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Find Rides Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_find_rides"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="Find Ride Partners"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="?android:colorPrimaryDark"
+                        app:cornerRadius="8dp"
+                        app:icon="@drawable/ic_search" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-        <!-- To Input -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- SEARCH RESULTS LAYOUT -->
+        <LinearLayout
+            android:id="@+id/layout_search_results"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="To"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <EditText
-            android:id="@+id/et_to"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter destination"
-            android:textColorHint="?android:textColorPrimary"
-            android:text=""
-            android:padding="12dp"
-            android:background="@drawable/bg_edit_text"
-            android:layout_marginBottom="16dp"
-            android:inputType="text"
-            android:maxLines="1" />
+            <!-- Results Header Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp">
 
-        <!-- When Spinner -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="When"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-        <Spinner
-            android:id="@+id/spn_when"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_edit_text"
-            android:layout_marginBottom="24dp"
-            android:entries="@array/when_options" />
+                    <!-- Header with Back Button -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
 
-        <!-- Buttons -->
-        <Button
-            android:id="@+id/btn_find_rides"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Find Ride Partners"
-            android:textColor="@android:color/white"
-            android:background="@drawable/bg_button_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_back_to_search"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Back"
+                            android:textColor="#2196F3"
+                            android:textSize="14sp"
+                            android:textAllCaps="false"
+                            app:backgroundTint="@android:color/transparent"
+                            app:icon="@drawable/ic_arrow_back"
+                            app:iconTint="#2196F3"
+                            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <ImageButton
+                            android:id="@+id/btn_clear_search"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_clear"
+                            android:contentDescription="Clear search"
+                            app:tint="#666666" />
+
+                    </LinearLayout>
+
+                    <!-- Search Info -->
+                    <TextView
+                        android:id="@+id/tv_search_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:visibility="gone"
+                        android:drawableStart="@drawable/ic_info"
+                        android:drawableTint="#666666"
+                        android:drawablePadding="8dp"
+                        android:text="Search results" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Progress Bar -->
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="32dp"
+                android:indeterminateTint="#2196F3"
+                android:visibility="gone" />
+
+            <!-- No Rides Found -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_no_rides"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="32dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="16dp"
+                        android:src="@drawable/ic_no_rides"
+                        app:tint="#CCCCCC" />
+
+                    <TextView
+                        android:id="@+id/tv_no_rides_found"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No rides found"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Try adjusting your search locations or time"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:textAlignment="center"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Rides RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_rides"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="16dp"
+                android:clipToPadding="false"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>
