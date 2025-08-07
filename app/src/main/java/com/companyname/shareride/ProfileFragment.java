@@ -82,8 +82,8 @@ public class ProfileFragment extends Fragment {
         tvUserName.setText(userDataManager.getUserName());
         tvRating.setText(userDataManager.getRating());
         tvSavings.setText(userDataManager.getSavings());
-        tvRidesShared.setText(userDataManager.getRidesShared());
-        tvCO2Reduced.setText(userDataManager.getCo2Reduced());
+        tvRidesShared.setText(userDataManager.getRidesSharedString()); // Also fixed this one
+        tvCO2Reduced.setText(userDataManager.getCo2ReducedString()); // Fixed method name
     }
 
     private void logout() {

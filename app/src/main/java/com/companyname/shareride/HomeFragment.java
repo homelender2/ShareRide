@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.BuildConfig;
 import com.companyname.shareride.database.RideDAO;
 import com.companyname.shareride.utils.LocationSearchHelper;
 import com.companyname.shareride.utils.LocationUtils;
@@ -51,7 +54,7 @@ public class HomeFragment extends Fragment {
     private MaterialAutoCompleteTextView spnWhen;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
-    private static final double DEFAULT_SEARCH_RADIUS_KM = 10.0;
+    private static final double DEFAULT_SEARCH_RADIUS_KM = 50.0;
 
     // UI Components - Search Form
     private AutoCompleteTextView etFrom, etTo;
@@ -86,6 +89,11 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // For testing - add sample data on app start
+        if (BuildConfig.DEBUG) {
+            populateSampleRides();
+        }
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Initialize managers
@@ -136,26 +144,65 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupLocationSearch() {
-        // Setup autocomplete for destination field
-        if (etTo != null) {
-            LocationSearchHelper.setupLocationAutoComplete(etTo, getContext(),
-                    new LocationSearchHelper.OnLocationSelectedListener() {
-                        @Override
-                        public void onLocationSelected(LocationSearchHelper.LocationSuggestion location, AutoCompleteTextView view) {
-                            toLatitude = location.latitude;
-                            toLongitude = location.longitude;
-                            view.setTag("coords:" + location.latitude + "," + location.longitude);
-                        }
+        // Simple location suggestions
+        String[] locations = {
+                "Koramangala, Bangalore",
+                "Electronic City, Bangalore",
+                "BTM Layout, Bangalore",
+                "Indiranagar, Bangalore",
+                "Whitefield, Bangalore"
+        };
 
-                        @Override
-                        public void onLocationCleared(AutoCompleteTextView view) {
-                            toLatitude = 0.0;
-                            toLongitude = 0.0;
-                            view.setTag(null);
-                        }
-                    });
-        }
+        // Setup FROM field
+        ArrayAdapter<String> fromAdapter = new ArrayAdapter<>(
+                getContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                locations
+        );
+        etFrom.setAdapter(fromAdapter);
+        etFrom.setThreshold(1);
+
+        // Setup TO field
+        ArrayAdapter<String> toAdapter = new ArrayAdapter<>(
+                getContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                locations
+        );
+        etTo.setAdapter(toAdapter);
+        etTo.setThreshold(1);
+
+        // Handle selection for FROM field
+        etFrom.setOnItemClickListener((parent, view, position, id) -> {
+            String selected = (String) parent.getItemAtPosition(position);
+            setCoordinatesForFrom(selected);
+        });
+
+        // Handle selection for TO field
+        etTo.setOnItemClickListener((parent, view, position, id) -> {
+            String selected = (String) parent.getItemAtPosition(position);
+            setCoordinatesForTo(selected);
+        });
     }
+
+    private void setCoordinatesForFrom(String locationName) {
+        if (locationName.contains("Koramangala")) {
+            fromLatitude = 12.9352;
+            fromLongitude = 77.6245;
+            etFrom.setTag("coords:" + fromLatitude + "," + fromLongitude);
+        }
+        // Add more locations...
+    }
+
+    private void setCoordinatesForTo(String locationName) {
+        if (locationName.contains("Electronic City")) {
+            toLatitude = 12.8456;
+            toLongitude = 77.6603;
+            etTo.setTag("coords:" + toLatitude + "," + toLongitude);
+        }
+        // Add more locations...
+    }
+
+
 
     private void setupRecyclerView() {
         if (recyclerView != null) {
@@ -224,28 +271,38 @@ public class HomeFragment extends Fragment {
     }
 
     private void performRideSearch() {
-        // Validate input
-        if (etFrom.getText().toString().trim().isEmpty()) {
+        // Validate input with detailed logging
+        String fromText = etFrom.getText().toString().trim();
+        String toText = etTo.getText().toString().trim();
+
+        Log.d("HomeFragment", "=== RIDE SEARCH DEBUG ===");
+        Log.d("HomeFragment", "FROM text: " + fromText);
+        Log.d("HomeFragment", "TO text: " + toText);
+
+        if (fromText.isEmpty()) {
             Toast.makeText(getContext(), "Please enter pickup location", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (etTo.getText().toString().trim().isEmpty()) {
+        if (toText.isEmpty()) {
             Toast.makeText(getContext(), "Please enter destination", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Check if we have coordinates for both locations
+        // Check coordinates with logging
         double[] fromCoords = getFromCoordinates();
         double[] toCoords = getToCoordinates();
 
+        Log.d("HomeFragment", "FROM coords: " + fromCoords[0] + "," + fromCoords[1]);
+        Log.d("HomeFragment", "TO coords: " + toCoords[0] + "," + toCoords[1]);
+
         if (fromCoords[0] == 0.0 && fromCoords[1] == 0.0) {
-            Toast.makeText(getContext(), "Please select a valid pickup location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Please select a valid pickup location from the suggestions", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (toCoords[0] == 0.0 && toCoords[1] == 0.0) {
-            Toast.makeText(getContext(), "Please select a valid destination", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Please select a valid destination from the suggestions", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -253,11 +310,16 @@ public class HomeFragment extends Fragment {
         showSearchResults();
         showLoading(true);
 
+        Log.d("HomeFragment", "Starting database search...");
+        Log.d("HomeFragment", "Search radius: " + DEFAULT_SEARCH_RADIUS_KM + " km");
+
         // Perform search in background
         new Thread(() -> {
             try {
                 long currentTime = System.currentTimeMillis();
                 long endTime = currentTime + (24 * 60 * 60 * 1000); // 24 hours from now
+
+                Log.d("HomeFragment", "Time window: " + currentTime + " to " + endTime);
 
                 List<Ride> searchResults = rideDAO.searchRides(
                         fromCoords[0], fromCoords[1],
@@ -268,6 +330,8 @@ public class HomeFragment extends Fragment {
                         1 // minimum 1 seat available
                 );
 
+                Log.d("HomeFragment", "Database returned " + searchResults.size() + " rides");
+
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         rideList.clear();
@@ -276,27 +340,34 @@ public class HomeFragment extends Fragment {
                         showLoading(false);
                         updateSearchResultsUI();
 
-                        String distance = LocationUtils.formatDistance(
-                                LocationUtils.calculateDistance(fromCoords[0], fromCoords[1], toCoords[0], toCoords[1])
+                        String distance = com.companyname.shareride.utils.LocationUtils.formatDistance(
+                                com.companyname.shareride.utils.LocationUtils.calculateDistance(
+                                        fromCoords[0], fromCoords[1], toCoords[0], toCoords[1])
                         );
                         updateSearchInfo("Found " + searchResults.size() + " rides • Distance: " + distance);
+
+                        Log.d("HomeFragment", "UI updated with " + rideList.size() + " rides");
                     });
                 }
 
             } catch (Exception e) {
+                Log.e("HomeFragment", "Search error: " + e.getMessage(), e);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         showLoading(false);
                         Toast.makeText(getContext(), "Search error: " + e.getMessage(),
                                 Toast.LENGTH_SHORT).show();
 
-                        // Fallback to sample data
+                        // Fallback to sample data for debugging
+                        Log.d("HomeFragment", "Loading sample rides as fallback");
                         loadSampleRides();
                     });
                 }
             }
         }).start();
     }
+
+
 
     private void loadSampleRides() {
         rideList.clear();
@@ -654,5 +725,124 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    // Add this method to populate sample rides
+    private void populateSampleRides() {
+        new Thread(() -> {
+            try {
+                RideDAO rideDAO = new RideDAO(getContext());
 
+                // Check if rides already exist to avoid duplicates
+                List<Ride> existingRides = rideDAO.getAllActiveRides();
+                if (!existingRides.isEmpty()) {
+                    Log.d("HomeFragment", "Sample data already exists, skipping population");
+                    rideDAO.close();
+                    return;
+                }
+
+                Log.d("HomeFragment", "Populating sample rides...");
+
+                // Create sample rides with proper database constructor
+                long currentTime = System.currentTimeMillis();
+
+                // Ride 1: Koramangala to Electronic City
+                Ride ride1 = new Ride();
+                ride1.setFromAddress("Koramangala, Bangalore");
+                ride1.setFromLatitude(12.9352);
+                ride1.setFromLongitude(77.6245);
+                ride1.setToAddress("Electronic City, Bangalore");
+                ride1.setToLatitude(12.8456);
+                ride1.setToLongitude(77.6603);
+                ride1.setDepartureTime(currentTime + (30 * 60 * 1000)); // 30 minutes from now
+                ride1.setAvailableSeats(3);
+                ride1.setPrice(40.0);
+                ride1.setDriverId(1);
+                ride1.setStatus("active");
+
+                // Ride 2: BTM Layout to Whitefield
+                Ride ride2 = new Ride();
+                ride2.setFromAddress("BTM Layout, Bangalore");
+                ride2.setFromLatitude(12.9165);
+                ride2.setFromLongitude(77.6101);
+                ride2.setToAddress("Whitefield, Bangalore");
+                ride2.setToLatitude(12.9698);
+                ride2.setToLongitude(77.7500);
+                ride2.setDepartureTime(currentTime + (45 * 60 * 1000)); // 45 minutes from now
+                ride2.setAvailableSeats(2);
+                ride2.setPrice(60.0);
+                ride2.setDriverId(2);
+                ride2.setStatus("active");
+
+                // Insert rides
+                long result1 = rideDAO.createRide(ride1);
+                long result2 = rideDAO.createRide(ride2);
+
+                Log.d("HomeFragment", "Inserted ride 1 with ID: " + result1);
+                Log.d("HomeFragment", "Inserted ride 2 with ID: " + result2);
+
+                rideDAO.close();
+
+                // Show success message
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Sample rides populated successfully!",
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+
+            } catch (Exception e) {
+                Log.e("HomeFragment", "Error populating sample rides", e);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Error: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        }).start();
+    }
+
+
+    // Add this button click for testing
+    private void debugCoordinates() {
+        Log.d("HomeFragment", "=== DEBUG COORDINATES ===");
+        Log.d("HomeFragment", "FROM tag: " + (etFrom.getTag() != null ? etFrom.getTag().toString() : "null"));
+        Log.d("HomeFragment", "TO tag: " + (etTo.getTag() != null ? etTo.getTag().toString() : "null"));
+
+        double[] fromCoords = getFromCoordinates();
+        double[] toCoords = getToCoordinates();
+
+        Log.d("HomeFragment", "FROM coords: " + fromCoords[0] + "," + fromCoords[1]);
+        Log.d("HomeFragment", "TO coords: " + toCoords[0] + "," + toCoords[1]);
+
+        Toast.makeText(getContext(),
+                "FROM: " + fromCoords[0] + "," + fromCoords[1] + "\nTO: " + toCoords[0] + "," + toCoords[1],
+                Toast.LENGTH_LONG).show();
+    }
+
+    private void debugDatabaseContent() {
+        new Thread(() -> {
+            try {
+                RideDAO debugDAO = new RideDAO(getContext());
+                List<Ride> allRides = debugDAO.getAllActiveRides();
+
+                Log.d("HomeFragment", "=== DATABASE DEBUG ===");
+                Log.d("HomeFragment", "Total rides in database: " + allRides.size());
+
+                for (Ride ride : allRides) {
+                    Log.d("HomeFragment", "Ride ID: " + ride.getId());
+                    Log.d("HomeFragment", "FROM: " + ride.getFromAddress() + " (" +
+                            ride.getFromLatitude() + "," + ride.getFromLongitude() + ")");
+                    Log.d("HomeFragment", "TO: " + ride.getToAddress() + " (" +
+                            ride.getToLatitude() + "," + ride.getToLongitude() + ")");
+                    Log.d("HomeFragment", "Available seats: " + ride.getAvailableSeats());
+                    Log.d("HomeFragment", "Status: " + ride.getStatus());
+                }
+
+                debugDAO.close();
+
+            } catch (Exception e) {
+                Log.e("HomeFragment", "Database debug error", e);
+            }
+        }).start();
+    }
 }
