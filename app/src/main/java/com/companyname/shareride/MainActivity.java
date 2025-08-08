@@ -99,7 +99,9 @@ public class MainActivity extends AppCompatActivity {
                 int itemId = item.getItemId();
                 if (itemId == R.id.nav_home) {
                     fragment = new HomeFragment();
-                } else if (itemId == R.id.nav_rides) {
+                } else if(itemId == R.id.nav_create_ride) {
+                    fragment = new CreateRideFragment();
+                }else if (itemId == R.id.nav_rides) {
                     fragment = new MyRidesFragment();
                 } else if (itemId == R.id.nav_profile) {
                     fragment = new ProfileFragment();

@@ -28,6 +28,7 @@ public class Ride {
     private String passengers;
     private String time;
     private String names;
+    private String description;
 
     // Status constants
     public static final String STATUS_ACTIVE = "active";
@@ -75,15 +76,23 @@ public class Ride {
         // Update legacy fields for compatibility
         updateLegacyFields();
     }
-
-    // Constructor with price and seats
-    public Ride(long driverId, String fromAddress, double fromLat, double fromLng,
-                String toAddress, double toLat, double toLng, long departureTime,
-                int availableSeats, double price) {
-        this(driverId, fromAddress, fromLat, fromLng, toAddress, toLat, toLng, departureTime);
+    public Ride(long id, String fromAddress, double fromLatitude, double fromLongitude,
+                String toAddress, double toLatitude, double toLongitude,
+                long departureTime, int availableSeats, double price) {
+        this.id = id;
+        this.fromAddress = fromAddress;
+        this.fromLatitude = fromLatitude;
+        this.fromLongitude = fromLongitude;
+        this.toAddress = toAddress;
+        this.toLatitude = toLatitude;
+        this.toLongitude = toLongitude;
+        this.departureTime = departureTime;
         this.availableSeats = availableSeats;
         this.price = price;
-        updateLegacyFields();
+        this.status = "active";
+        this.description = ""; // Initialize description
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
     }
 
     // Database Getters and Setters
@@ -379,4 +388,14 @@ public class Ride {
     public int hashCode() {
         return Long.hashCode(id);
     }
+
+    // Add these methods with your other getters and setters
+    public String getDescription() {
+        return description != null ? description : "";
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }

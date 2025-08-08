@@ -1,7 +1,13 @@
 package com.companyname.shareride.utils;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Locale;
 
 public class LocationUtils {
 
@@ -76,12 +82,150 @@ public class LocationUtils {
     }
 
     /**
+     * Get address string from coordinates using reverse geocoding
+     *
+     * @param context The Android context
+     * @param latitude The latitude coordinate
+     * @param longitude The longitude coordinate
+     * @return Address string or null if not found
+     */
+    public static String getAddressFromCoordinates(Context context, double latitude, double longitude) {
+        if (context == null || !isValidCoordinate(latitude, longitude)) {
+            return null;
+        }
+
+        try {
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+
+            // Check if Geocoder is present on device
+            if (!Geocoder.isPresent()) {
+                return "Geocoder not available";
+            }
+
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+
+                // Build a detailed address string
+                StringBuilder addressBuilder = new StringBuilder();
+
+                // Add street number and name
+                if (address.getSubThoroughfare() != null) {
+                    addressBuilder.append(address.getSubThoroughfare()).append(" ");
+                }
+                if (address.getThoroughfare() != null) {
+                    addressBuilder.append(address.getThoroughfare()).append(", ");
+                }
+
+                // Add locality/area
+                if (address.getSubLocality() != null) {
+                    addressBuilder.append(address.getSubLocality()).append(", ");
+                }
+
+                // Add city
+                if (address.getLocality() != null) {
+                    addressBuilder.append(address.getLocality());
+                }
+
+                String result = addressBuilder.toString();
+                // Clean up trailing comma and spaces
+                result = result.replaceAll(",\\s*$", "").trim();
+
+                // If we couldn't build a detailed address, use the first address line
+                return result.isEmpty() ? address.getAddressLine(0) : result;
+            }
+
+        } catch (IOException e) {
+            // Network error or service unavailable
+            return "Address lookup failed";
+        } catch (IllegalArgumentException e) {
+            // Invalid coordinates
+            return "Invalid coordinates";
+        } catch (Exception e) {
+            // Other errors
+            e.printStackTrace();
+            return "Error getting address";
+        }
+
+        return "Address not found";
+    }
+
+    /**
+     * Alternative simpler version that returns just the main address line
+     */
+    public static String getSimpleAddressFromCoordinates(Context context, double latitude, double longitude) {
+        try {
+            if (context == null || !isValidCoordinate(latitude, longitude)) {
+                return null;
+            }
+
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            if (!Geocoder.isPresent()) {
+                return "Location unavailable";
+            }
+
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                return addresses.get(0).getAddressLine(0);
+            }
+
+        } catch (IOException e) {
+            return "Network error";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "Unknown location";
+    }
+
+    /**
+     * Get coordinates from address string using forward geocoding
+     *
+     * @param context The Android context
+     * @param addressString The address to geocode
+     * @return Coordinates array [latitude, longitude] or null if not found
+     */
+    public static double[] getCoordinatesFromAddress(Context context, String addressString) {
+        if (context == null || addressString == null || addressString.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+
+            if (!Geocoder.isPresent()) {
+                return null;
+            }
+
+            List<Address> addresses = geocoder.getFromLocationName(addressString, 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                return new double[]{address.getLatitude(), address.getLongitude()};
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Format distance for display (e.g., "2.5 km", "150 m")
      */
     public static String formatDistance(double distanceKm) {
+        if (distanceKm < 0) {
+            return "0 m";
+        }
+
         if (distanceKm < 1.0) {
             // Show in meters if less than 1km
-            int meters = (int) (distanceKm * 1000);
+            int meters = (int) Math.round(distanceKm * 1000);
             return meters + " m";
         } else {
             // Show in kilometers with one decimal place
@@ -94,10 +238,14 @@ public class LocationUtils {
      * Format distance for display with custom unit
      */
     public static String formatDistance(double distance, boolean useKilometers) {
+        if (distance < 0) {
+            return useKilometers ? "0 m" : "0 ft";
+        }
+
         DecimalFormat df = new DecimalFormat("#.#");
         if (useKilometers) {
             if (distance < 1.0) {
-                int meters = (int) (distance * 1000);
+                int meters = (int) Math.round(distance * 1000);
                 return meters + " m";
             } else {
                 return df.format(distance) + " km";
@@ -105,7 +253,7 @@ public class LocationUtils {
         } else {
             // Miles
             if (distance < 0.1) {
-                int feet = (int) (distance * 5280);
+                int feet = (int) Math.round(distance * 5280);
                 return feet + " ft";
             } else {
                 return df.format(distance) + " mi";
@@ -117,6 +265,9 @@ public class LocationUtils {
      * Check if two locations are within a specified radius
      */
     public static boolean isWithinRadius(double lat1, double lon1, double lat2, double lon2, double radiusKm) {
+        if (!isValidCoordinate(lat1, lon1) || !isValidCoordinate(lat2, lon2) || radiusKm < 0) {
+            return false;
+        }
         double distance = calculateDistance(lat1, lon1, lat2, lon2);
         return distance <= radiusKm;
     }
@@ -125,14 +276,16 @@ public class LocationUtils {
      * Validate latitude value
      */
     public static boolean isValidLatitude(double latitude) {
-        return latitude >= -90.0 && latitude <= 90.0;
+        return !Double.isNaN(latitude) && !Double.isInfinite(latitude) &&
+                latitude >= -90.0 && latitude <= 90.0 && latitude != 0.0;
     }
 
     /**
      * Validate longitude value
      */
     public static boolean isValidLongitude(double longitude) {
-        return longitude >= -180.0 && longitude <= 180.0;
+        return !Double.isNaN(longitude) && !Double.isInfinite(longitude) &&
+                longitude >= -180.0 && longitude <= 180.0 && longitude != 0.0;
     }
 
     /**
@@ -147,6 +300,10 @@ public class LocationUtils {
      * @return Bearing in degrees (0-360)
      */
     public static double calculateBearing(double lat1, double lon1, double lat2, double lon2) {
+        if (!isValidCoordinate(lat1, lon1) || !isValidCoordinate(lat2, lon2)) {
+            return 0.0;
+        }
+
         double lat1Rad = Math.toRadians(lat1);
         double lat2Rad = Math.toRadians(lat2);
         double deltaLonRad = Math.toRadians(lon2 - lon1);
@@ -180,24 +337,28 @@ public class LocationUtils {
      * @return Estimated time in minutes
      */
     public static int calculateEstimatedTravelTime(double distanceKm, double averageSpeedKmh) {
-        if (averageSpeedKmh <= 0) {
-            averageSpeedKmh = 50; // Default city driving speed
+        if (distanceKm < 0 || averageSpeedKmh <= 0) {
+            averageSpeedKmh = 25; // Default city driving speed with traffic
         }
         double timeHours = distanceKm / averageSpeedKmh;
-        return (int) Math.ceil(timeHours * 60); // Convert to minutes and round up
+        return Math.max(1, (int) Math.ceil(timeHours * 60)); // Minimum 1 minute
     }
 
     /**
-     * Calculate estimated travel time with default speed (50 km/h)
+     * Calculate estimated travel time with default speed (25 km/h for city with traffic)
      */
     public static int calculateEstimatedTravelTime(double distanceKm) {
-        return calculateEstimatedTravelTime(distanceKm, 50.0);
+        return calculateEstimatedTravelTime(distanceKm, 25.0);
     }
 
     /**
      * Format travel time for display
      */
     public static String formatTravelTime(int minutes) {
+        if (minutes <= 0) {
+            return "0 min";
+        }
+
         if (minutes < 60) {
             return minutes + " min";
         } else {
@@ -216,6 +377,10 @@ public class LocationUtils {
      * Useful for database queries to limit search area
      */
     public static LocationBounds getLocationBounds(double centerLat, double centerLon, double radiusKm) {
+        if (!isValidCoordinate(centerLat, centerLon) || radiusKm <= 0) {
+            return null;
+        }
+
         // Approximate degrees per kilometer
         double latDegreePerKm = 1.0 / 111.0; // 1 degree latitude ≈ 111 km
         double lonDegreePerKm = 1.0 / (111.0 * Math.cos(Math.toRadians(centerLat)));
@@ -247,6 +412,11 @@ public class LocationUtils {
             this.maxLongitude = maxLon;
         }
 
+        public boolean contains(double latitude, double longitude) {
+            return latitude >= minLatitude && latitude <= maxLatitude &&
+                    longitude >= minLongitude && longitude <= maxLongitude;
+        }
+
         @Override
         public String toString() {
             return String.format("Bounds[lat: %.4f to %.4f, lon: %.4f to %.4f]",
@@ -266,5 +436,79 @@ public class LocationUtils {
      */
     public static double milesToKm(double miles) {
         return miles * 1.609344;
+    }
+
+    /**
+     * Calculate CO2 reduction from ride sharing
+     * @param distanceKm Distance in kilometers
+     * @param passengers Number of passengers sharing the ride
+     * @return CO2 reduction in kg
+     */
+    public static double calculateCO2Reduction(double distanceKm, int passengers) {
+        if (distanceKm <= 0 || passengers <= 0) {
+            return 0.0;
+        }
+
+        // Average car emits about 120g CO2 per km
+        double totalEmission = distanceKm * 0.12; // kg CO2
+
+        // Reduction = (passengers * individual emission) - shared emission
+        // Assuming ride sharing reduces per-person emission by 60-80%
+        double reductionFactor = 0.7; // 70% reduction per person
+        return totalEmission * passengers * reductionFactor;
+    }
+
+    /**
+     * Check if a coordinate is likely within a specific city/region
+     * (Can be extended with more specific bounds for different cities)
+     */
+    public static boolean isWithinCity(double latitude, double longitude, String cityName) {
+        if (!isValidCoordinate(latitude, longitude) || cityName == null) {
+            return false;
+        }
+
+        // Example bounds for Bangalore (can be extended for other cities)
+        if (cityName.toLowerCase().contains("bangalore") || cityName.toLowerCase().contains("bengaluru")) {
+            return latitude >= 12.7 && latitude <= 13.2 && longitude >= 77.3 && longitude <= 77.9;
+        }
+
+        // Add more cities as needed
+        return true; // Default to true for unknown cities
+    }
+
+    /**
+     * Get area/locality from detailed address
+     */
+    public static String getLocalityFromAddress(Context context, double latitude, double longitude) {
+        try {
+            if (context == null || !isValidCoordinate(latitude, longitude)) {
+                return "Unknown area";
+            }
+
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            if (!Geocoder.isPresent()) {
+                return "Area unavailable";
+            }
+
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+
+                // Try to get the most specific locality
+                if (address.getSubLocality() != null) {
+                    return address.getSubLocality();
+                } else if (address.getLocality() != null) {
+                    return address.getLocality();
+                } else if (address.getAdminArea() != null) {
+                    return address.getAdminArea();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "Unknown area";
     }
 }
